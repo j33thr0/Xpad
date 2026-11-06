@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>X pad</title>
+<style>
+  :root { --bg:#0a0a0b; --card:#141416; --line:#2a2a2e; --text:#f4f4f5; --muted:#9b9ba1; --cyan:#19e3f5; --green:#3ee07a; --red:#ff5d6c; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.4 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  a { color:inherit; text-decoration:none; }
+  button, input { font:inherit; color:inherit; }
+  header { display:flex; align-items:center; justify-content:space-between; gap:16px; max-width:1200px; margin:0 auto; padding:18px 24px; }
+  .logo { font-weight:800; font-size:28px; letter-spacing:-.5px; }
+  nav { display:flex; gap:40px; }
+  nav a { padding:6px 0; border-bottom:3px solid transparent; font-weight:500; }
+  nav a.on { border-color:var(--cyan); }
+  main { max-width:1200px; margin:0 auto; padding:8px 24px 64px; }
+  .pill { border:1.5px solid var(--line); background:none; border-radius:999px; padding:10px 22px; cursor:pointer; font-weight:600; white-space:nowrap; }
+  .pill:hover { border-color:#55555c; }
+  .pill.on, .primary { background:var(--cyan); color:#05181b; border-color:var(--cyan); }
+  .primary { width:100%; border:0; border-radius:999px; padding:18px; font-size:20px; font-weight:700; cursor:pointer; }
+  .primary:disabled { opacity:.45; cursor:default; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:22px; padding:28px; }
+  h1 { font-size:clamp(36px, 7vw, 72px); letter-spacing:-2px; margin:40px 0 8px; text-align:center; line-height:1.05; }
+  .sub { color:var(--muted); text-align:center; font-size:clamp(16px, 2.2vw, 22px); margin:0 0 48px; }
+  .steps { display:flex; align-items:center; gap:16px; margin-bottom:32px; }
+  .step { display:flex; align-items:center; gap:12px; color:var(--muted); font-weight:600; font-size:19px; }
+  .step b { width:44px; height:44px; border-radius:50%; border:1.5px solid var(--line); display:grid; place-items:center; font-size:16px; flex:none; }
+  .step.on { color:var(--text); } .step.on b { background:var(--cyan); color:#05181b; border-color:var(--cyan); }
+  .step.done b { border-color:var(--cyan); color:var(--cyan); }
+  .steps hr { flex:1; border:0; border-top:1px solid var(--line); min-width:12px; }
+  label { display:block; font-weight:700; font-size:19px; margin:0 0 12px; }
+  .field { display:flex; align-items:center; border:1.5px solid var(--line); border-radius:14px; padding:0 16px; margin-bottom:24px; }
+  .field:focus-within { border-color:#55555c; }
+  .field input { flex:1; min-width:0; background:none; border:0; outline:0; padding:16px 0; font-size:17px; }
+  .field .x { background:none; border:0; cursor:pointer; font-size:20px; color:var(--muted); }
+  .chips { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin-bottom:28px; }
+  .perks { display:flex; justify-content:center; flex-wrap:wrap; gap:0; margin-top:44px; color:#d6d6da; }
+  .perks span { padding:4px 36px; border-left:1px solid var(--line); } .perks span:first-child { border:0; }
+  .err { color:var(--red); min-height:22px; margin:-8px 0 12px; }
+  .ok { color:var(--green); }
+  .muted { color:var(--muted); }
+  .launch { max-width:1160px; margin:0 auto; }
+  .row2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .toolbar { display:flex; gap:24px; align-items:center; margin:24px 0; }
+  .toolbar .field { flex:1; margin:0; border-radius:999px; }
+  .tabs { display:flex; border:1.5px solid var(--line); border-radius:999px; padding:5px; }
+  .tabs .pill { border:0; }
+  .grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:28px; }
+  .tok { display:block; padding:28px 30px; }
+  .tok:hover { border-color:#45454b; }
+  .who { display:flex; align-items:center; gap:22px; margin-bottom:28px; }
+  .av { width:84px; height:84px; border-radius:50%; flex:none; background:var(--cyan); color:#05181b; display:grid; place-items:center; font-weight:800; font-size:26px; overflow:hidden; }
+  .av img { width:100%; height:100%; object-fit:cover; }
+  .h { font-size:24px; font-weight:700; } .sym { color:var(--muted); font-size:20px; }
+  .mc { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:24px; font-weight:700; }
+  .mc > span:first-child { white-space:nowrap; }
+  .badge { font-size:15px; font-weight:600; border-radius:999px; padding:9px 18px; border:1.5px solid var(--line); white-space:nowrap; }
+  .badge.claimed { background:var(--green); color:#05200f; border-color:var(--green); }
+  .tp { display:grid; grid-template-columns:1fr 380px; gap:24px; align-items:start; }
+  .tp .side { display:grid; gap:24px; }
+  .price { display:flex; align-items:center; gap:18px; font-size:44px; font-weight:800; flex-wrap:wrap; }
+  .chg { font-size:18px; border-radius:999px; padding:5px 12px; background:var(--green); color:#05200f; }
+  .chg.down { background:var(--red); color:#200508; }
+  .chart { width:100%; height:300px; margin-top:16px; }
+  .trade input { width:100%; background:none; border:1.5px solid var(--line); border-radius:999px; padding:18px 24px; font-size:22px; font-weight:600; outline:0; margin:16px 0; }
+  .bigfee { font-size:clamp(34px, 6vw, 64px); font-weight:800; text-align:center; margin:4px 0 24px; }
+  .verified { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; font-size:20px; font-weight:600; }
+  code { background:#000; border:1px solid var(--line); border-radius:8px; padding:2px 6px; word-break:break-all; }
+  .demo { text-align:center; color:var(--muted); font-size:13px; padding:10px; border-top:1px solid var(--line); }
+  /* ---------- motion ---------- */
+  @keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+  @keyframes fade { from { opacity:0; transform:translateX(12px); } to { opacity:1; transform:none; } }
+  @keyframes pop { 0% { opacity:0; transform:scale(.6); } 70% { transform:scale(1.08); } 100% { opacity:1; transform:none; } }
+  @keyframes ring { 0% { box-shadow:0 0 0 0 rgba(25,227,245,.55); } 100% { box-shadow:0 0 0 14px rgba(25,227,245,0); } }
+  @keyframes shine { to { background-position:-200% 0; } }
+  @keyframes draw { to { stroke-dashoffset:0; } }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  #app.enter > * { animation:rise .5s cubic-bezier(.2,.7,.2,1) both; }
+  #app.enter > :nth-child(2) { animation-delay:.07s; } #app.enter > :nth-child(3) { animation-delay:.14s; } #app.enter > :nth-child(4) { animation-delay:.21s; }
+  #body > * { animation:fade .35s ease both; }
+  .grid > .tok { animation:rise .45s cubic-bezier(.2,.7,.2,1) both; animation-delay:calc(var(--i, 0) * 50ms); }
+  h1 { background:linear-gradient(100deg, #fff 42%, #a8f7ff 50%, #fff 58%) 0 0 / 200% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; padding-bottom:.1em; animation:shine 7s linear infinite; }
+  #app.enter h1 { animation:rise .5s cubic-bezier(.2,.7,.2,1) both, shine 7s linear infinite; }
+  .pill, .primary, .tok, .field, nav a, .step b { transition:transform .18s ease, box-shadow .25s ease, background-color .2s, border-color .2s, color .2s; }
+  .primary:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 10px 32px rgba(25,227,245,.35); }
+  .pill:hover:not(:disabled) { transform:translateY(-1px); }
+  .pill:active:not(:disabled), .primary:active:not(:disabled) { transform:scale(.97); }
+  .tok:hover { transform:translateY(-5px); box-shadow:0 16px 36px rgba(0,0,0,.45), 0 0 0 1px rgba(25,227,245,.15); }
+  .tok .av { transition:transform .3s cubic-bezier(.2,.7,.2,1); } .tok:hover .av { transform:scale(1.06) rotate(-3deg); }
+  .field:focus-within { box-shadow:0 0 0 4px rgba(25,227,245,.12); }
+  .step.on b { animation:ring 1.8s ease-out infinite; }
+  .chg, .badge { animation:pop .45s ease both .25s; }
+  .chart .draw { stroke-dasharray:1; stroke-dashoffset:1; animation:draw 1.1s ease-out forwards; }
+  .chart .area { animation:rise .9s ease both .3s; }
+  .chart .dot { animation:pop .4s ease both 1s; }
+  .busy::before { content:""; display:inline-block; width:12px; height:12px; margin-right:8px; vertical-align:-1px; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; animation:spin .7s linear infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration:.01ms !important; animation-delay:0s !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+  }
+  @media (max-width:900px) { .grid { grid-template-columns:1fr 1fr; } .tp { grid-template-columns:1fr; } }
+  @media (max-width:640px) {
+    header { padding:14px 16px; } nav { gap:18px; } main { padding:8px 16px 48px; } .logo { font-size:22px; }
+    .grid, .row2 { grid-template-columns:1fr; } .toolbar { flex-direction:column; align-items:stretch; }
+    .card { padding:20px; } .step span { display:none; } .perks span { border:0; padding:4px 12px; }
+    .av { width:60px; height:60px; } .price { font-size:32px; }
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.17.0/dist/ethers.umd.min.js"></script>
+<script async src="https://platform.twitter.com/widgets.js"></script>
+</head>
+<body>
+<header>
+  <a class="logo" href="#/">X pad</a>
+  <nav><a href="#/explore" data-nav="explore">Explore</a><a href="#/claim" data-nav="claim">Claim fees</a></nav>
+  <button class="pill" id="connect">Connect Wallet</button>
+</header>
+<main id="app"></main>
+<div class="demo" id="demo"></div>
+
+<script>
+const { ethers } = window;
+const ABI = [
+  "event Launched(address indexed token, address indexed launcher, string handle, string source, string name, string symbol)",
+  "event Trade(address indexed token, address indexed trader, bool isBuy, uint256 eth, uint256 tokens, uint256 vEth, uint256 vTokens, uint256 time)",
+  "event Claimed(bytes32 indexed handleHash, string handle, address to, uint256 amount)",
+  "function launch(string name, string symbol, string handle, string source) returns (address)",
+  "function buy(address token, uint256 minTokens) payable",
+  "function sell(address token, uint256 amount, uint256 minEth)",
+  "function claim(string handle, address to, uint256 deadline, bytes sig)",
+  "function curves(address) view returns (bytes32 handle, uint256 vEth, uint256 vTokens, uint256 sold)",
+  "function feesOf(string handle) view returns (uint256)",
+];
+const ERC20 = ["function balanceOf(address) view returns (uint256)", "function allowance(address,address) view returns (uint256)", "function approve(address,uint256) returns (bool)"];
+const SUPPLY = 1_000_000_000; // whole tokens, matches XPad.SUPPLY
+const LAUNCH = { vEth: 2n * 10n ** 18n, vTokens: 1_073_000_000n * 10n ** 18n }; // matches XPad.V_ETH / V_TOKENS
+const FEE_BPS = 100n;
+const SLIPPAGE_BPS = 500n; // trades revert if the price moves more than 5% before they land
+
+let cfg, rpc, pad, signer = null, me = null, ethUsd = null;
+const $ = (s) => document.querySelector(s);
+const app = $("#app");
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const short = (a) => a.slice(0, 6) + "…" + a.slice(-4);
+const errMsg = (e) => e?.shortMessage || e?.reason || e?.info?.error?.message || e?.message || String(e);
+
+// ---------- X links ----------
+function parseX(link) {
+  let u;
+  try { u = new URL(link.trim()); } catch { return null; }
+  if (!/^(www\.|mobile\.)?(x|twitter)\.com$/.test(u.hostname)) return null;
+  const p = u.pathname.split("/").filter(Boolean);
+  const url = `https://x.com/${p.join("/")}`;
+  if (p[0] === "i" && p[1] === "communities" && /^\d+$/.test(p[2] ?? "")) return { type: "Community", url, handle: "" };
+  if (p[0] === "i" && p[1] === "spaces" && p[2]) return { type: "Space", url, handle: "" };
+  const handle = /^[A-Za-z0-9_]{1,15}$/.test(p[0] ?? "") && p[0] !== "i" ? p[0].toLowerCase() : "";
+  if (handle && p[1] === "status" && /^\d+$/.test(p[2] ?? "")) return { type: "Post", url, handle, postId: p[2] };
+  if (handle && p.length === 1) return { type: "Profile", url, handle };
+  return null;
+}
+const sourceOf = (s) => parseX(s) ?? { type: "Link", url: "", handle: "" };
+
+function avatar(handle) {
+  const letters = esc((handle || "?").slice(0, 2).toUpperCase());
+  if (!handle) return `<div class="av">${letters}</div>`;
+  return `<div class="av"><img alt="" src="https://unavatar.io/x/${esc(handle)}?fallback=false" onerror="this.parentNode.textContent='${letters}'"></div>`;
+}
+function embedPost(el, postId) {
+  const tryEmbed = () => window.twttr?.widgets ? twttr.widgets.createTweet(postId, el, { theme: "dark", dnt: true }) : setTimeout(tryEmbed, 300);
+  tryEmbed();
+}
+
+// ---------- numbers ----------
+const toEth = (wei) => Number(ethers.formatEther(wei));
+const priceEth = (c) => Number(c.vEth) / Number(c.vTokens); // ETH per token
+function money(eth, compact = true) {
+  if (ethUsd == null) return `${fmt(eth, compact)} ETH`;
+  return "$" + fmt(eth * ethUsd, compact);
+}
+function fmt(n, compact) {
+  if (compact && n >= 1000) return new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(n);
+  if (n >= 1) return n.toLocaleString("en", { maximumFractionDigits: 2 });
+  return n.toPrecision(2).replace(/(\.\d*?)0+$/, "$1");
+}
+// Same maths as XPad.buy / XPad.sell, rounding in the pool's favour.
+const ceilDiv = (a, b) => (a + b - 1n) / b;
+function quoteBuy(c, wei) { const inn = wei - wei * FEE_BPS / 10000n; return c.vTokens - ceilDiv(c.vEth * c.vTokens, c.vEth + inn); }
+function quoteSell(c, amount) { const g = c.vEth - ceilDiv(c.vEth * c.vTokens, c.vTokens + amount); return g - g * FEE_BPS / 10000n; }
+const minus = (x) => x - x * SLIPPAGE_BPS / 10000n;
+
+// ---------- chain ----------
+async function load() {
+  cfg = await (await fetch("/config.json")).json();
+  rpc = new ethers.JsonRpcProvider(cfg.rpc, cfg.chainId, { staticNetwork: true });
+  pad = new ethers.Contract(cfg.xpad, ABI, rpc);
+  $("#demo").textContent = `Test network only (${cfg.chainName}). Coins and ETH here have no real value.`;
+  fetch("https://api.coinbase.com/v2/prices/ETH-USD/spot").then((r) => r.json()).then((j) => { ethUsd = Number(j.data.amount) || null; route(); }).catch(() => {});
+}
+// shortcut: reads every event from the deploy block on each page view; add an indexer once there are thousands of coins.
+const events = (name, ...args) => pad.queryFilter(pad.filters[name](...args), cfg.deployBlock);
+
+async function tokens() {
+  const [launched, claimed] = await Promise.all([events("Launched"), events("Claimed")]);
+  const claimedSet = new Set(claimed.map((e) => e.args.handle));
+  return Promise.all(launched.map(async (e, i) => {
+    const [c, fees] = await Promise.all([pad.curves(e.args.token), pad.feesOf(e.args.handle)]);
+    const curve = { vEth: c.vEth, vTokens: c.vTokens, sold: c.sold };
+    return { i, token: e.args.token, handle: e.args.handle, source: e.args.source, name: e.args.name, symbol: e.args.symbol,
+      curve, mcEth: priceEth(curve) * SUPPLY, fees, everClaimed: claimedSet.has(e.args.handle) };
+  }));
+}
+
+async function connect() {
+  if (window.ethereum) {
+    const chainId = "0x" + cfg.chainId.toString(16);
+    try {
+      await ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId }] });
+    } catch (e) {
+      if (e.code !== 4902) throw e;
+      await ethereum.request({ method: "wallet_addEthereumChain", params: [{ chainId, chainName: cfg.chainName, rpcUrls: [cfg.rpc],
+        nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 }, blockExplorerUrls: cfg.explorer ? [cfg.explorer] : undefined }] });
+    }
+    signer = await new ethers.BrowserProvider(ethereum).getSigner();
+  } else if (cfg.chainId === 31337) {
+    signer = await rpc.getSigner(1); // local test chain only: an unlocked dev account stands in for a wallet
+  } else {
+    throw new Error("Install MetaMask (or another Ethereum wallet) to connect");
+  }
+  me = await signer.getAddress();
+  $("#connect").textContent = short(me);
+}
+async function needWallet() { if (!signer) await connect(); return signer; }
+async function send(fn, statusEl) {
+  statusEl.className = "muted busy"; statusEl.textContent = "Approve in your wallet…";
+  const tx = await fn();
+  statusEl.textContent = "Waiting for the network…";
+  const r = await tx.wait();
+  statusEl.className = "ok"; statusEl.textContent = "Done.";
+  return r;
+}
+
+// ---------- pages ----------
+const draft = { link: "", type: "Post", src: null, handle: "", name: "", symbol: "", step: 1 };
+
+function launchPage() {
+  const s = draft.step;
+  const st = (n, t) => `<div class="step ${s === n ? "on" : s > n ? "done" : ""}"><b>0${n}</b><span>${t}</span></div>`;
+  enter(); app.innerHTML = `
+    <h1>Tokenise anything on X.</h1>
+    <p class="sub">Posts, profiles, communities, spaces. Launch on Robinhood Chain in under a minute.</p>
+    <div class="card launch">
+      <div class="steps">${st(1, "Source")}<hr>${st(2, "Token")}<hr>${st(3, "Launch")}</div>
+      <div id="body"></div>
+    </div>
+    <div class="perks"><span>⛓ Robinhood Chain</span><span>% 1% creator fees</span><span>👛 Review, then approve in your wallet</span></div>`;
+  const body = $("#body");
+
+  if (s === 1) {
+    body.innerHTML = `
+      <label for="link">Paste any X link</label>
+      <div class="field"><input id="link" placeholder="https://x.com/someone/status/123…" value="${esc(draft.link)}"><button class="x" id="clear" aria-label="Clear">✕</button></div>
+      <div class="chips">${["Post", "Profile", "Community", "Space"].map((t) => `<button class="pill ${draft.type === t ? "on" : ""}" data-type="${t}">${t}</button>`).join("")}</div>
+      <div class="err" id="err"></div>
+      <button class="primary" id="next">Continue</button>`;
+    const input = $("#link");
+    input.oninput = () => { draft.link = input.value; const p = parseX(input.value); if (p) { draft.type = p.type; body.querySelectorAll("[data-type]").forEach((b) => b.classList.toggle("on", b.dataset.type === p.type)); } };
+    $("#clear").onclick = () => { draft.link = ""; input.value = ""; input.focus(); };
+    body.querySelectorAll("[data-type]").forEach((b) => b.onclick = () => { draft.type = b.dataset.type; launchPage(); });
+    $("#next").onclick = () => {
+      const p = parseX(draft.link);
+      if (!p) return ($("#err").textContent = "That isn't an X post, profile, community or space link.");
+      if (p.type !== draft.type) return ($("#err").textContent = `That link is a ${p.type.toLowerCase()}, not a ${draft.type.toLowerCase()}.`);
+      Object.assign(draft, { src: p, handle: p.handle || draft.handle, step: 2 });
+      if (!draft.symbol && p.handle) { draft.symbol = p.handle.replace(/_/g, "").slice(0, 6).toUpperCase(); draft.name = p.handle; }
+      launchPage();
+    };
+  } else if (s === 2) {
+    body.innerHTML = `
+      <div id="preview" style="margin-bottom:20px"></div>
+      <div class="row2">
+        <div><label for="name">Coin name</label><div class="field"><input id="name" maxlength="32" value="${esc(draft.name)}"></div></div>
+        <div><label for="sym">Ticker</label><div class="field">$<input id="sym" maxlength="10" value="${esc(draft.symbol)}"></div></div>
+      </div>
+      <label for="handle">Creator fees go to</label>
+      <div class="field">@<input id="handle" maxlength="15" placeholder="handle of the ${esc(draft.src.type.toLowerCase())} owner" value="${esc(draft.handle)}"></div>
+      <div class="err" id="err"></div>
+      <div class="row2"><button class="pill" id="back">Back</button><button class="primary" id="next">Continue</button></div>`;
+    if (draft.src.postId) embedPost($("#preview"), draft.src.postId);
+    else $("#preview").innerHTML = `<a class="muted" href="${esc(draft.src.url)}" target="_blank" rel="noopener">${esc(draft.src.type)}: ${esc(draft.src.url)} ↗</a>`;
+    $("#back").onclick = () => { draft.step = 1; launchPage(); };
+    $("#next").onclick = () => {
+      draft.name = $("#name").value.trim(); draft.symbol = $("#sym").value.trim().toUpperCase(); draft.handle = $("#handle").value.trim().replace(/^@/, "").toLowerCase();
+      if (!draft.name || !draft.symbol) return ($("#err").textContent = "Give the coin a name and a ticker.");
+      if (!/^[a-z0-9_]{1,15}$/.test(draft.handle)) return ($("#err").textContent = "Enter the X handle that should earn the 1% fees.");
+      draft.step = 3; launchPage();
+    };
+  } else {
+    body.innerHTML = `
+      <div class="who">${avatar(draft.handle)}<div><div class="h">$${esc(draft.symbol)} · ${esc(draft.name)}</div>
+        <div class="sym">${esc(draft.src.type)} · fees to @${esc(draft.handle)}</div></div></div>
+      <p class="muted">1,000,000,000 coins. 800M sell on a bonding curve priced in ETH; the price rises as people buy. 1% of every buy and sell is held for @${esc(draft.handle)} until they claim it.</p>
+      <div class="err" id="err"></div>
+      <div class="row2"><button class="pill" id="back">Back</button><button class="primary" id="go">Launch $${esc(draft.symbol)}</button></div>`;
+    $("#back").onclick = () => { draft.step = 2; launchPage(); };
+    $("#go").onclick = async () => {
+      const err = $("#err"); $("#go").disabled = true;
+      try {
+        await needWallet();
+        const r = await send(() => pad.connect(signer).launch(draft.name, draft.symbol, draft.handle, draft.src.url), err);
+        const ev = r.logs.map((l) => { try { return pad.interface.parseLog(l); } catch { return null; } }).find((l) => l?.name === "Launched");
+        Object.assign(draft, { link: "", src: null, handle: "", name: "", symbol: "", step: 1 });
+        location.hash = `#/t/${ev.args.token}`;
+      } catch (e) { err.className = "err"; err.textContent = errMsg(e); $("#go").disabled = false; }
+    };
+  }
+}
+
+let exploreTab = "Trending", exploreQuery = "";
+async function explorePage() {
+  enter(); app.innerHTML = `
+    <div class="toolbar">
+      <div class="field"><span class="muted">⌕</span>&nbsp;<input id="q" placeholder="Search posts or handles" value="${esc(exploreQuery)}"></div>
+      <div class="tabs">${["Trending", "New", "Channels"].map((t) => `<button class="pill ${exploreTab === t ? "on" : ""}" data-tab="${t}">${t}</button>`).join("")}</div>
+    </div>
+    <div class="grid" id="grid"><p class="muted busy">Loading coins…</p></div>`;
+  app.querySelectorAll("[data-tab]").forEach((b) => b.onclick = () => { exploreTab = b.dataset.tab; explorePage(); });
+  let list = await tokens();
+  const draw = () => {
+    const q = exploreQuery.toLowerCase().replace(/^[@$]/, "");
+    let l = list.filter((t) => !q || t.handle.includes(q) || t.symbol.toLowerCase().includes(q) || t.name.toLowerCase().includes(q) || t.source.toLowerCase().includes(q));
+    if (exploreTab === "Channels") l = l.filter((t) => ["Community", "Space"].includes(sourceOf(t.source).type));
+    l.sort(exploreTab === "New" ? (a, b) => b.i - a.i : (a, b) => b.mcEth - a.mcEth);
+    $("#grid").innerHTML = l.map((t, k) => `
+      <a class="card tok" style="--i:${Math.min(k, 12)}" href="#/t/${t.token}">
+        <div class="who">${avatar(t.handle)}<div><div class="h">@${esc(t.handle)}</div><div class="sym">$${esc(t.symbol)}</div></div></div>
+        <div class="mc"><span>MC ${money(t.mcEth)}</span>${feeBadge(t)}</div>
+      </a>`).join("") || `<p class="muted">No coins yet. <a href="#/" style="color:var(--cyan)">Launch the first one.</a></p>`;
+  };
+  $("#q").oninput = (e) => { exploreQuery = e.target.value; draw(); };
+  draw();
+}
+const feeBadge = (t) => t.fees > 0n ? `<span class="badge">Fees unclaimed</span>` : t.everClaimed ? `<span class="badge claimed">Fees claimed</span>` : "";
+
+let range = "1D", side = "Buy";
+async function tokenPage(addr) {
+  if (!ethers.isAddress(addr)) return (app.innerHTML = `<p>Unknown coin.</p>`);
+  const t = (await tokens()).find((x) => x.token.toLowerCase() === addr.toLowerCase());
+  if (!t) return (app.innerHTML = `<p>Unknown coin. <a href="#/explore">Back to Explore</a></p>`);
+  const trades = (await events("Trade", t.token)).map((e) => ({ time: Number(e.args.time), p: Number(e.args.vEth) / Number(e.args.vTokens) }));
+  const src = sourceOf(t.source);
+  enter(); app.innerHTML = `
+    <p><a href="#/explore">← Explore</a></p>
+    <div class="who">${avatar(t.handle)}<div class="price">$${esc(t.symbol)}</div></div>
+    <div class="tp">
+      <div style="display:grid; gap:24px">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; align-items:center">
+            <div class="price"><span>${money(priceEth(t.curve), false)}</span><span id="chg"></span></div>
+            <div class="tabs">${["1H", "1D", "1W"].map((r) => `<button class="pill ${range === r ? "on" : ""}" data-range="${r}">${r}</button>`).join("")}</div>
+          </div>
+          <svg class="chart" id="chart" viewBox="0 0 800 300" preserveAspectRatio="none"></svg>
+          <div class="muted">MC ${money(t.mcEth)} · ${fmt(Number(ethers.formatEther(t.curve.sold)) / 8e6, false)}% of the curve sold</div>
+        </div>
+        <div class="card" id="src"></div>
+      </div>
+      <div class="side">
+        <div class="card trade">
+          <div class="tabs">${["Buy", "Sell"].map((x) => `<button class="pill ${side === x ? "on" : ""}" style="flex:1" data-side="${x}">${x}</button>`).join("")}</div>
+          <input id="amt" inputmode="decimal" placeholder="${side === "Buy" ? "0.05 ETH" : `0 ${esc(t.symbol)}`}">
+          <div class="muted" id="quote" style="margin:-6px 0 14px">&nbsp;</div>
+          <button class="primary" id="trade">${side} $${esc(t.symbol)}</button>
+          <div class="muted" id="tstat" style="margin-top:12px"></div>
+        </div>
+        <div class="card">
+          <div class="h" style="margin-bottom:14px">Creator fees</div>
+          <div style="font-size:22px; font-weight:700; margin-bottom:18px">👛 Unclaimed ${fmt(toEth(t.fees), false)} ETH</div>
+          <a class="pill" style="display:block; text-align:center; padding:16px" href="#/claim/${esc(t.handle)}">Are you @${esc(t.handle)}? Claim</a>
+        </div>
+      </div>
+    </div>`;
+  if (src.postId) embedPost($("#src"), src.postId);
+  else $("#src").innerHTML = src.url ? `<a href="${esc(src.url)}" target="_blank" rel="noopener">${esc(src.type)} on X: ${esc(src.url)} ↗</a>` : `<span class="muted">No X link.</span>`;
+  drawChart(trades, t);
+  app.querySelectorAll("[data-range]").forEach((b) => b.onclick = () => { range = b.dataset.range; app.querySelectorAll("[data-range]").forEach((x) => x.classList.toggle("on", x === b)); drawChart(trades, t); });
+  app.querySelectorAll("[data-side]").forEach((b) => b.onclick = () => { side = b.dataset.side; tokenPage(addr); });
+
+  const amt = $("#amt"), quote = $("#quote"), stat = $("#tstat");
+  const erc = new ethers.Contract(t.token, ERC20, rpc);
+  const parse = () => { try { return ethers.parseEther(amt.value.trim() || "0"); } catch { return 0n; } };
+  const showBal = async () => { if (me && side === "Sell") quote.textContent = `You have ${fmt(toEth(await erc.balanceOf(me)), true)} ${t.symbol}`; };
+  showBal();
+  amt.oninput = () => {
+    const v = parse();
+    if (!v) return showBal();
+    try { quote.textContent = side === "Buy" ? `≈ ${fmt(toEth(quoteBuy(t.curve, v)), true)} ${t.symbol}` : `≈ ${fmt(toEth(quoteSell(t.curve, v)), false)} ETH`; }
+    catch { quote.textContent = "Too big for the curve"; }
+  };
+  $("#trade").onclick = async () => {
+    const v = parse();
+    if (!v) return (stat.textContent = "Enter an amount.");
+    $("#trade").disabled = true;
+    try {
+      await needWallet();
+      const c = await pad.curves(t.token); // fresh reserves, not the ones from page load
+      const live = { vEth: c.vEth, vTokens: c.vTokens };
+      if (side === "Buy") {
+        await send(() => pad.connect(signer).buy(t.token, minus(quoteBuy(live, v)), { value: v }), stat);
+      } else {
+        const tok = erc.connect(signer);
+        if ((await tok.allowance(me, cfg.xpad)) < v) await send(() => tok.approve(cfg.xpad, v), stat);
+        await send(() => pad.connect(signer).sell(t.token, v, minus(quoteSell(live, v))), stat);
+      }
+      setTimeout(() => tokenPage(addr), 800);
+    } catch (e) { stat.className = "err"; stat.textContent = errMsg(e); $("#trade").disabled = false; }
+  };
+}
+
+function drawChart(trades, t) {
+  const span = { "1H": 3600, "1D": 86400, "1W": 604800 }[range];
+  const now = Math.floor(Date.now() / 1000), from = now - span;
+  const start = priceEth(LAUNCH);
+  const before = trades.filter((x) => x.time < from).pop();
+  const pts = [{ time: from, p: before ? before.p : start }, ...trades.filter((x) => x.time >= from), { time: now, p: priceEth(t.curve) }];
+  const lo = Math.min(...pts.map((x) => x.p)) * 0.95, hi = Math.max(...pts.map((x) => x.p)) * 1.05;
+  const X = (time) => 50 + (time - from) / span * 740, Y = (p) => 280 - (p - lo) / (hi - lo || 1) * 260;
+  const line = pts.map((x, i) => `${i ? "L" : "M"}${X(x.time).toFixed(1)},${Y(x.p).toFixed(1)}`).join("");
+  const ticks = [0, 1, 2, 3].map((i) => lo + (hi - lo) * (i + 0.5) / 4);
+  const last = pts[pts.length - 1];
+  $("#chart").innerHTML = `
+    <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#19e3f5" stop-opacity=".35"/><stop offset="1" stop-color="#19e3f5" stop-opacity="0"/></linearGradient></defs>
+    ${ticks.map((v) => `<line x1="50" x2="790" y1="${Y(v)}" y2="${Y(v)}" stroke="#2a2a2e"/><text x="0" y="${Y(v) + 4}" fill="#9b9ba1" font-size="12">${esc(money(v, false))}</text>`).join("")}
+    <path class="area" d="${line}L${X(now)},280L${X(from)},280Z" fill="url(#g)"/>
+    <path class="draw" pathLength="1" d="${line}" fill="none" stroke="#19e3f5" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+    <circle class="dot" cx="${X(last.time)}" cy="${Y(last.p)}" r="5" fill="#19e3f5" style="transform-box:fill-box; transform-origin:center"/>`;
+  const pct = (last.p / pts[0].p - 1) * 100;
+  $("#chg").className = "chg" + (pct < 0 ? " down" : "");
+  $("#chg").textContent = (pct >= 0 ? "+" : "") + pct.toFixed(Math.abs(pct) < 10 ? 1 : 0) + "%";
+}
+
+const claim = { handle: "", post: "", proof: null };
+async function claimPage(handleFromUrl) {
+  if (handleFromUrl && handleFromUrl !== claim.handle) Object.assign(claim, { handle: handleFromUrl, proof: null });
+  const h = claim.handle;
+  const fees = /^[a-z0-9_]{1,15}$/.test(h) ? await pad.feesOf(h) : 0n;
+  const text = `Claiming my X pad creator fees: ${me ?? "<connect your wallet first>"}`;
+  enter(); app.innerHTML = `
+    <h1>Claim your creator fees.</h1>
+    <p class="sub">Post your wallet address on X and claim the fees you've earned.</p>
+    <div class="card" style="margin-bottom:24px">
+      <div class="steps">
+        <div class="step ${!claim.proof ? "on" : "done"}"><b>1</b><span>Post your wallet address on X</span></div><hr>
+        <div class="step ${claim.proof ? "done" : ""}"><b>2</b><span>We verify it${h ? ` from @${esc(h)}` : ""}</span></div><hr>
+        <div class="step ${claim.proof ? "on" : ""}"><b>3</b><span>Claim your fees</span></div>
+      </div>
+      <label for="ch">Your X handle</label>
+      <div class="field">@<input id="ch" maxlength="15" value="${esc(h)}" placeholder="yourhandle"></div>
+      ${me ? `<p>From @${esc(h || "yourhandle")}, post: <code>${esc(text)}</code>
+        <a class="pill" style="margin-left:8px" target="_blank" rel="noopener" href="https://x.com/intent/post?text=${encodeURIComponent(text)}">Post on X ↗</a></p>`
+        : `<p><button class="pill" id="cw">Connect your wallet</button> <span class="muted">to see what to post.</span></p>`}
+      <label for="cp" style="margin-top:20px">Link to that post</label>
+      <div class="field"><input id="cp" placeholder="https://x.com/yourhandle/status/…" value="${esc(claim.post)}"></div>
+      <div class="err" id="verr"></div>
+      <button class="pill" id="verify" ${me ? "" : "disabled"}>Verify post</button>
+    </div>
+    ${claim.proof ? `<div class="card verified" style="margin-bottom:24px"><span class="ok">✔ Verified</span><span>👛 ${esc(short(me))}</span><span>𝕏 @${esc(h)} post</span></div>` : ""}
+    <div class="card">
+      <div class="bigfee">${fmt(toEth(fees), false)} ETH <span class="muted">unclaimed</span></div>
+      <button class="primary" id="claim" ${claim.proof && fees > 0n ? "" : "disabled"}>Claim fees</button>
+      <div class="muted" id="cstat" style="margin-top:12px; text-align:center"></div>
+    </div>`;
+  $("#ch").onchange = (e) => { claim.handle = e.target.value.trim().replace(/^@/, "").toLowerCase(); claim.proof = null; location.hash = `#/claim/${claim.handle}`; };
+  $("#cp").oninput = (e) => { claim.post = e.target.value.trim(); };
+  if ($("#cw")) $("#cw").onclick = () => connect().then(() => claimPage()).catch((e) => ($("#verr").textContent = errMsg(e)));
+  $("#verify").onclick = async () => {
+    const err = $("#verr"); err.className = "muted"; err.textContent = "Checking your post on X…";
+    try {
+      const r = await fetch("/api/verify", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ handle: claim.handle, postUrl: claim.post, wallet: me }) });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error);
+      claim.proof = { ...j, wallet: me };
+      claimPage();
+    } catch (e) { err.className = "err"; err.textContent = errMsg(e); }
+  };
+  $("#claim").onclick = async () => {
+    const st = $("#cstat"); $("#claim").disabled = true;
+    try {
+      await needWallet();
+      await send(() => pad.connect(signer).claim(claim.handle, claim.proof.wallet, claim.proof.deadline, claim.proof.sig), st);
+      claim.proof = null; setTimeout(() => claimPage(), 800);
+    } catch (e) { st.className = "err"; st.textContent = errMsg(e); $("#claim").disabled = false; }
+  };
+}
+
+// ---------- routing ----------
+// Pages animate in only when you arrive from a link, not when a step or tab re-draws them.
+let entering = false;
+const enter = () => { app.classList.toggle("enter", entering); entering = false; };
+async function route() {
+  entering = true;
+  const [, page = "", arg = ""] = location.hash.split("/");
+  document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("on", a.dataset.nav === page));
+  try {
+    if (page === "explore") await explorePage();
+    else if (page === "claim") await claimPage(arg.toLowerCase());
+    else if (page === "t") await tokenPage(arg);
+    else launchPage();
+  } catch (e) { app.innerHTML = `<p class="err">Could not reach the chain: ${esc(errMsg(e))}</p>`; }
+}
+$("#connect").onclick = () => connect().then(route).catch((e) => alert(errMsg(e)));
+window.addEventListener("hashchange", route);
+window.ethereum?.on?.("accountsChanged", () => location.reload());
+load().then(route).catch((e) => (app.innerHTML = `<p class="err">Could not load config.json. Run a deploy script first. (${esc(errMsg(e))})</p>`));
+</script>
+</body>
+</html>

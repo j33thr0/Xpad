@@ -1,0 +1,8 @@
+{
+  "chainId": 46630,
+  "chainName": "Robinhood Chain Testnet",
+  "rpc": "https://rpc.testnet.chain.robinhood.com",
+  "explorer": "https://explorer.testnet.chain.robinhood.com",
+  "xpad": "0x8e494288FB95769141057390bcd66310FDCECC25",
+  "deployBlock": 149506101
+}

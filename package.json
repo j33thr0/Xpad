@@ -1,0 +1,23 @@
+{
+  "name": "xpad",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "hardhat test",
+    "chain": "hardhat node",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network rhTestnet",
+    "start": "node server.js"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^4.0.0",
+    "@openzeppelin/contracts": "^5.6.1",
+    "hardhat": "^3.21.2"
+  },
+  "dependencies": {
+    "ethers": "6.17.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

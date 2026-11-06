@@ -1,0 +1,14 @@
+# Render Blueprint: New > Blueprint in the Render dashboard, pick this repo.
+services:
+  - type: web
+    name: xpad
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /config.json
+    envVars:
+      - key: HOST
+        value: 0.0.0.0 # Render's proxy must reach the app; PORT is set by Render
+      - key: VERIFIER_KEY
+        sync: false # Render asks for it: paste VERIFIER_KEY from your .env
