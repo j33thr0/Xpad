@@ -203,7 +203,8 @@ const events = (name, ...args) => pad.queryFilter(pad.filters[name](...args), cf
 async function tokens() {
   const [launched, claimed] = await Promise.all([events("Launched"), events("Claimed")]);
   const claimedSet = new Set(claimed.map((e) => e.args.handle));
-  return Promise.all(launched.map(async (e, i) => {
+  const hidden = new Set((cfg.hidden ?? []).map((a) => a.toLowerCase())); // coins kept off the site (they stay on-chain)
+  return Promise.all(launched.filter((e) => !hidden.has(e.args.token.toLowerCase())).map(async (e, i) => {
     const [c, fees] = await Promise.all([pad.curves(e.args.token), pad.feesOf(e.args.handle)]);
     const curve = { vEth: c.vEth, vTokens: c.vTokens, sold: c.sold };
     return { i, token: e.args.token, handle: e.args.handle, source: e.args.source, name: e.args.name, symbol: e.args.symbol,

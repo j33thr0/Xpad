@@ -4,5 +4,8 @@
   "rpc": "https://rpc.testnet.chain.robinhood.com",
   "explorer": "https://explorer.testnet.chain.robinhood.com",
   "xpad": "0x8e494288FB95769141057390bcd66310FDCECC25",
-  "deployBlock": 149506101
+  "deployBlock": 149506101,
+  "hidden": [
+    "0x2eDC05D296F71b4bB86846DB97C74057d1D98fFC"
+  ]
 }
